@@ -1,13 +1,15 @@
 import { test as setup, expect } from '@playwright/test';
+import { AdminLoginPage } from '../pages/admin.login.page';
 import { STORAGE_STATE } from '../playwright.config';
 
 setup('do login', async ({ page }) => {
-  await page.goto('simpletodolist/todolists.html');
-  await page.locator('#navadminlogin').click();
-  await page.getByPlaceholder('Enter Username').fill('Admin');
-  await page.getByPlaceholder('Enter Password').fill('AdminPass');
-  await page.locator('#login').click();
 
+  const adminLoginPage = new AdminLoginPage(page);
+
+  await adminLoginPage.goto();
+  await expect(adminLoginPage.adminLoginHeader).toBeVisible();
+
+  await adminLoginPage.login('Admin', 'AdminPass');
   // Wait until page is loaded after login
   await expect(page.getByText('Admin View')).toBeVisible();
 
