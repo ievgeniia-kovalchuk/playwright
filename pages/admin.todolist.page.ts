@@ -8,6 +8,7 @@ export class AdminTodolistPage {
   readonly todoListToggles: Locator; 
   readonly todoCount: Locator;
   readonly toggleAll: Locator;
+  readonly untoggleAll: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -17,6 +18,7 @@ export class AdminTodolistPage {
     this.todoListToggles = page.locator('//ul//input');
     this.todoCount = page.locator('.todo-count strong');
     this.toggleAll = page.locator('#toggle-all');
+    this.untoggleAll = page.locator('.clear-completed');
   }
 
   async goto() {
