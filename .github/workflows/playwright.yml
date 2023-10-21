@@ -24,4 +24,8 @@ jobs:
       with:
         name: playwright-report
         path: playwright-report/
+<<<<<<< Updated upstream
         retention-days: 30
+=======
+        retention-days: 30
+>>>>>>> Stashed changes
