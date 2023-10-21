@@ -28,5 +28,6 @@ export class TodolistPage {
   async openTodolist(name)
   {
     await this.page.locator(`//ul//div[contains(.,\'${name}\')]/a`).click();
+    await expect(this.pageHeader).toHaveText(`TODOs : ${name}`);
   }
 }
