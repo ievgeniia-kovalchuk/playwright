@@ -4,21 +4,19 @@ export class AdminTodolistPage {
   readonly page: Page
   readonly pageHeader: Locator
   readonly newTodo: Locator
-  readonly todoListToggles: Locator
   readonly todoCount: Locator
-  readonly toggleAll: Locator
-  readonly untoggleAll: Locator
+  readonly completeAll: Locator
   readonly todoList: Locator
+  readonly removeTodo: Locator
 
   constructor(page: Page) {
     this.page = page;
     this.pageHeader = page.locator('header h1')
     this.newTodo = page.getByPlaceholder('Enter new todo text here')
-    this.todoListToggles = page.locator('//ul//input')
     this.todoCount = page.locator('.todo-count strong')
-    this.toggleAll = page.locator('#toggle-all')
-    this.untoggleAll = page.locator('.clear-completed')
+    this.completeAll = page.locator('#toggle-all')
     this.todoList = page.locator('.todo-list')
+    this.removeTodo = page.locator('.destroy')
   }
 
   async goto() {
@@ -42,13 +40,45 @@ export class AdminTodolistPage {
 
   async markAllAsComplete()
   {
-    await expect(this.toggleAll).not.toBeChecked()
-    await this.toggleAll.check()
+    await expect(this.completeAll).not.toBeChecked()
+    await this.completeAll.check()
     
     await this.todoList.first().waitFor()
-    let count = await this.todoList.getByRole('checkbox').count()
+    let checkboxes = this.todoList.getByRole('checkbox')
+    let count = await checkboxes.count()
     for (let i = 0; i < count; i++) {
-      await expect(this.todoList.getByRole('checkbox').nth(i)).toBeChecked()
+      await expect(checkboxes.nth(i)).toBeChecked()
     }
+  }
+
+  async removeItem(text: string)
+  {
+    await this.todoList.locator('.view', {hasText:text}).locator(this.removeTodo).click()
+  }
+
+  async completeItem(text: string)
+  {
+    await this.todoList.locator('.view', {hasText:text}).getByRole('checkbox').check()
+  }
+
+  async getTodoItems(): Promise<string[]>{
+    let results = [""]
+
+    await this.todoList.locator('.view').first().waitFor({state:'visible'})
+    results = await this.todoList.locator('.view').allTextContents()
+
+    return results
+  }
+
+  assertTodos(expectedTodos: string[], actualTodos: string[]): boolean
+  {
+    var expectedTodosSorted = expectedTodos.sort()
+    var actualTodosSorted = actualTodos.sort()
+
+    console.log("expected:\n"+expectedTodosSorted)
+    console.log("actual:\n"+actualTodosSorted)
+    var result = JSON.stringify(actualTodosSorted) === JSON.stringify(expectedTodosSorted)
+    console.log("result: " + result)
+    return result
   }
 }

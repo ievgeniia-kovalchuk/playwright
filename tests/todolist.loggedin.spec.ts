@@ -10,7 +10,7 @@ test.beforeEach(async ({page}) => {
 
 test.describe('admin todo - no initial data', () => {
 
-  test('admin todolist - add items', async () => {
+  test('add items', async () => {
     await adminTodolistPage.addNewTodo('test item 1')
     await expect(adminTodolistPage.todoList).toHaveText(['test item 1'])
     await expect(adminTodolistPage.todoCount).toHaveText('1')
@@ -22,12 +22,26 @@ test.describe('admin todo - no initial data', () => {
 
 test.describe('admin todo - fill in data', () =>
 {
+  let itemsList = ['item1', 'item2', 'item3']
+
   test.beforeEach(async () => {
-    await adminTodolistPage.fillTodolist(['item1', 'item2', 'item3'])
+    await adminTodolistPage.fillTodolist(itemsList)
   });
 
   test('mark all as complete', async () => {
     await adminTodolistPage.markAllAsComplete()
     await expect(adminTodolistPage.todoCount).toHaveText('0')
   });
+
+  test('remove item', async () => {
+    await adminTodolistPage.removeItem(itemsList[0])
+    await expect(adminTodolistPage.todoCount).toHaveText('2')
+    expect(adminTodolistPage.assertTodos(itemsList.slice(1), await adminTodolistPage.getTodoItems())).toBeTruthy()
+  })
+
+  test('complete item', async () => {
+    await adminTodolistPage.completeItem(itemsList[0])
+    await expect(adminTodolistPage.todoCount).toHaveText('2')
+    expect(adminTodolistPage.assertTodos(itemsList, await adminTodolistPage.getTodoItems())).toBeTruthy()
+  })
 });
