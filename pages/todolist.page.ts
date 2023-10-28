@@ -5,17 +5,30 @@ export class TodolistPage {
   readonly pageHeader: Locator
   readonly newTodolist: Locator
   readonly todolistsList: Locator
+  readonly listItems: Locator
 
   constructor(page: Page) {
     this.page = page
     this.pageHeader = page.locator('header h1')
     this.newTodolist = page.locator('.new-todo-list')
     this.todolistsList = page.locator('//ul//label')
+    this.listItems = page.getByRole('listitem')
   }
 
   async goto() {
     await this.page.goto('simpletodolist/todolists.html')
     await expect(this.pageHeader).toHaveText('todos List Management')
+  }
+
+  async getAllTodolistNames(): Promise<string[]>
+  {
+    const todolistNames: Array<string> = []
+    for (const item of await this.listItems.all())
+    {
+      const name = await item.locator('label').textContent() ?? ""
+      todolistNames.push(name)
+    }
+    return todolistNames
   }
 
   async addNewTodolist(name)
