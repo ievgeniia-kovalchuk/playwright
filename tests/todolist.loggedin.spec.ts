@@ -1,6 +1,7 @@
 import { test} from '@playwright/test';
 import { PageManager } from '../pages/page.manager';
 import { expect } from "../fixtures/arrayContains";
+import { Transformers } from "../helpers/transformers";
 
 test.describe('admin view', () => {
   let pm : PageManager;
@@ -15,7 +16,7 @@ test.describe('admin view', () => {
   });
 
   test('new list is visible', async () => {
-    const listName = 'list';
+    const listName = Transformers.replaceSpacesWithDashes('my list');
     await pm.navigateTo().listsPage();
     await pm.onListManagementPage().addNewList(listName);
     await pm.onListManagementPage().openList(listName);
