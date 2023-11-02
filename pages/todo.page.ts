@@ -67,4 +67,8 @@ export class TodoPage {
     async filterCompleted(){
         await this.filters.filter({hasText: 'Completed'}).getByRole('link').click()
     }
+
+    async clearCompleted(){
+        await this.page.locator('.clear-completed').click()
+    }
 }

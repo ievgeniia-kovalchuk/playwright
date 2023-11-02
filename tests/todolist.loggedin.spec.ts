@@ -1,47 +1,29 @@
-import { test, expect } from '@playwright/test'
-import { AdminTodolistPage } from '../pages/admin.todolist.page'
+import { test} from '@playwright/test';
+import { PageManager } from '../pages/page.manager';
+import { expect } from "../fixtures/arrayContains";
 
-let adminTodolistPage
+test.describe('admin view', () => {
+  let pm : PageManager;
 
-test.beforeEach(async ({page}) => {
-  adminTodolistPage = new AdminTodolistPage(page)
-  adminTodolistPage.goto()
-});
-
-test.describe('admin todo - no initial data', () => {
-
-  test('add items', async () => {
-    await adminTodolistPage.addNewTodo('test item 1')
-    await expect(adminTodolistPage.todoList).toHaveText(['test item 1'])
-    await expect(adminTodolistPage.todoCount).toHaveText('1')
-    await adminTodolistPage.addNewTodo('test item 2')
-    await expect(adminTodolistPage.todoList).toContainText(['test item 2'])
-    await expect(adminTodolistPage.todoCount).toHaveText('2')
-  })
-})
-
-test.describe('admin todo - fill in data', () =>
-{
-  let itemsList = ['item1', 'item2', 'item3']
-
-  test.beforeEach(async () => {
-    await adminTodolistPage.fillTodolist(itemsList)
+  test.beforeEach(async ({page}) => {
+    pm = new PageManager(page);
+    await pm.navigateTo().adminViewPage();
   });
 
-  test('mark all as complete', async () => {
-    await adminTodolistPage.markAllAsComplete()
-    await expect(adminTodolistPage.todoCount).toHaveText('0')
+  test('default list is visible', async() => {
+    expect (await pm.onAdminTodoPage().getListAdminView('eviltester')).toContainItemWithText('eviltester {"active":0,"completed":0,"total":0}')
   });
 
-  test('remove item', async () => {
-    await adminTodolistPage.removeItem(itemsList[0])
-    await expect(adminTodolistPage.todoCount).toHaveText('2')
-    expect(adminTodolistPage.assertTodos(itemsList.slice(1), await adminTodolistPage.getTodoItems())).toBeTruthy()
-  })
+  test('new list is visible', async () => {
+    const listName = 'list';
+    await pm.navigateTo().listsPage();
+    await pm.onListManagementPage().addNewList(listName);
+    await pm.onListManagementPage().openList(listName);
+    const todos = ['todo1', 'todo2', 'todo3'];
+    await pm.onTodoPage().addMultipleTodos(todos);
+    await pm.onTodoPage().markOneAsComplete(todos[0]);
 
-  test('complete item', async () => {
-    await adminTodolistPage.completeItem(itemsList[0])
-    await expect(adminTodolistPage.todoCount).toHaveText('2')
-    expect(adminTodolistPage.assertTodos(itemsList, await adminTodolistPage.getTodoItems())).toBeTruthy()
-  })
+    await pm.navigateTo().adminViewPage();
+    expect (await pm.onAdminTodoPage().getListAdminView('eviltester')).toContainItemWithText(`${listName} {"active":2,"completed":1,"total":3}`)
+  });
 });

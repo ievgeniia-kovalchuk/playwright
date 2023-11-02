@@ -1,12 +1,12 @@
-import {Page} from "@playwright/test"
-import {expect} from "../fixtures/arrayContains"
+import {Page} from "@playwright/test";
+import {expect} from "../fixtures/arrayContains";
 
 export class ListManagementPage{
-    private readonly page: Page
-    
+    private readonly page: Page;
+
     constructor(page: Page)
     {
-        this.page = page
+        this.page = page;
     }
 
     async addNewList(name: string)
@@ -36,7 +36,7 @@ export class ListManagementPage{
         await this.page.getByRole('listitem').filter({hasText: name}).getByRole('link').click()
         await expect(this.page.getByPlaceholder('Enter new todo text here')).toBeVisible()
     }
-
+    
     private replaceSpacesWithDashes(name: string) {
         if (name.includes(' ')) {
             let regex = /\s/gi
